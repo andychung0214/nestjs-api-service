@@ -1,3 +1,5 @@
+import { ParseIntPipe } from '../pipe/parse-int/parse-int.pipe';
+import { DocumentService } from './document.service';
 import {
   Controller,
   Get,
@@ -12,37 +14,21 @@ import {
 
 @Controller('document')
 export class DocumentController {
-  data = [
-    {
-      name: '存有與虛無',
-      author: '沙特',
-      id: 1,
-    },
-    {
-      name: '單子論',
-      author: '萊布尼茲',
-      id: 2,
-    },
-    {
-      name: '物不遷論',
-      author: '僧肇',
-      id: 3,
-    },
-    {
-      name: '道德經',
-      author: '老子',
-      id: 4,
-    },
-  ];
+  constructor(private documentService: DocumentService) {}
+
   @Get()
   getAllDocument(@Response() res) {
-    res.status(HttpStatus.OK).json(this.data);
+    this.documentService.getDocumentData().subscribe((data) => {
+      res.status(HttpStatus.OK).json(data);
+    });
   }
 
   @Get('/:id')
-  getDocument(@Response() res, @Param() param) {
-    const resData = this.data.filter((data) => data.id === Number(param.id));
-    res.status(HttpStatus.OK).json(resData);
+  getDocument(@Param('id', new ParseIntPipe()) id, @Response() res) {
+    this.documentService.getDocumentData().subscribe((data) => {
+      const resData = data.filter((data) => data.id === id);
+      res.status(HttpStatus.OK).json(resData);
+    });
   }
 
   @Post()
